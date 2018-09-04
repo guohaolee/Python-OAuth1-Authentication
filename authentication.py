@@ -1,4 +1,5 @@
 import requests
+import sys
 from requests_oauthlib import OAuth1Session
 from requests_oauthlib import OAuth1
 
@@ -32,18 +33,20 @@ def get_temporary_token():
     # get request_token_key, request_token_secret and other details
     data = request_token.get(url)
     print("\nRequesting Temporary token and token secret")
-    print("Returned Data : " + data.text + '\n')
-    
-    # Split the string to get relevant data 
-    data_token = str.split(data.text, '&')
-    ro_key = str.split(data_token[0], '=')
-    ro_secret = str.split(data_token[1], '=')
+    try:
+        # Split the string to get relevant data 
+        data_token = str.split(data.text, '&')
+        ro_key = str.split(data_token[0], '=')
+        ro_secret = str.split(data_token[1], '=')
 
-    # Assign split keys to variable
-    temporary_key = ro_key[1]
-    temporary_secret = ro_secret[1]
-    print("Temporary Oauth Token: " + temporary_key)
-    print("Temporary Oauth Secret Token: " + temporary_secret)
+        # Assign split keys to variable
+        temporary_key = ro_key[1]
+        temporary_secret = ro_secret[1]
+        print("Temporary Oauth Token: " + temporary_key)
+        print("Temporary Oauth Secret Token: " + temporary_secret)
+    except:
+        print(data.text)
+        sys.exit(0)
 
     temporary = [temporary_key, temporary_secret]
     return temporary
@@ -66,16 +69,18 @@ def finaltoken():
                           resource_owner_key=temporarycredentials[0],
                           resource_owner_secret=temporarycredentials[1],
                           verifier=verifier)
-                          
-    oauth_tokens = oauth.fetch_access_token(access_token_url)
-    OAuth_key = oauth_tokens.get('oauth_token')
-    OAuth_secret = oauth_tokens.get('oauth_token_secret')
+    try:                          
+        oauth_tokens = oauth.fetch_access_token(access_token_url)
+        OAuth_key = oauth_tokens.get('oauth_token')
+        OAuth_secret = oauth_tokens.get('oauth_token_secret')
 
-    print('Permanent OAuth Token = ', OAuth_key)
-    print('Permanent OAuth Token Secret = ', OAuth_secret)
+        print('Permanent OAuth Token = ', OAuth_key)
+        print('Permanent OAuth Token Secret = ', OAuth_secret)
 
-    permanenttoken = [OAuth_key,OAuth_secret]
-    return permanenttoken
+        permanenttoken = [OAuth_key,OAuth_secret]
+        return permanenttoken
+    except:
+        print("Error authentication")
 
 def testapi():
     Oauth_Token =permanenttoken[0]
